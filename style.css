@@ -9,7 +9,7 @@ body{
 }
 .card{
     width: 90%;
-    max-width: 470px;
+    max-width: 600px;
     background: linear-gradient(135deg, #00feba, #5b548a);
     color: #fff;
     margin: 100px auto 0;
@@ -89,4 +89,26 @@ body{
     font-size: 14px;
     margin-top: 10px;
     display: none;
+}
+.forecast{
+    margin-top: 30px;
+}
+.forecast-container{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+.forecast-item{
+    background: #ffffff33;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    width: 120px;
+    margin: 10px;
+}
+.forecast-icon{
+    width: 50px;
+}
+.forecast-date, .forecast-temp{
+    font-size:16px;
 }

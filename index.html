@@ -36,6 +36,12 @@
                 </div>
             </div>
         </div>
+        <div class="forecast">
+            <h2>5-Day Forecast</h2>
+            <div class="forecast-container">
+
+            </div>
+        </div>
     </div>
 </div>
 
@@ -43,6 +49,7 @@
 
 const apiKey = "YOUR_API_KEY_HERE";
 const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=imperial&q=";
+const forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?units=imperial&q=";
 
 const searchBox = document.querySelector(".search input");
 const searchBtn = document.querySelector(".search button");
@@ -85,10 +92,38 @@ async function checkWeather(city){
         document.querySelector(".weather").style.display = "block";
         document.querySelector(".error").style.display = "none";
 
+        checkForecast(city);
     }
 
 //    console.log(data);
 
+}
+
+async function checkForecast(city) {
+    const response = await fetch(forecastUrl + city + `&appid=${apiKey}`);
+    const data = await response.json();
+
+    const forecastContainer = document.querySelector(".forecast-container");
+    forecastContainer.innerHTML = '';   //Clear previous forecast
+
+    data.list.forEach((forecast, index) => {
+        if (index % 8 == 0) {    // Show 1 forecast per day (8 intervals per day)
+            const forecastElement = document.createElement("div");
+            forecastElement.classList.add("forecast-item");
+
+            const date = new Date(forecast.dt_txt).toLocaleDateString();
+            const iconUrl = `images/${forecast.weather[0].main.toLowerCase()}.png`;
+            const temp = Math.round(forecast.main.temp) + "°F";
+
+            forecastElement.innerHTML = `
+                <img src="${iconUrl}" class="forecast-icon">
+                <p class="forecast-date">${date}</p>
+                <p class="forecast-temp">${temp}</p>
+            `;
+            forecastContainer.appendChild(forecastElement);
+
+        }
+    });
 }
 
 searchBtn.addEventListener("click", ()=>{
