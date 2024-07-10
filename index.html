@@ -50,6 +50,7 @@
 const apiKey = "YOUR_API_KEY_HERE";
 const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=imperial&q=";
 const forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?units=imperial&q=";
+const geoUrl = "https://api.openweathermap.org/data/2.5/weather?units=imperial";
 
 const searchBox = document.querySelector(".search input");
 const searchBtn = document.querySelector(".search button");
@@ -126,11 +127,62 @@ async function checkForecast(city) {
     });
 }
 
+function checkWeatherByCoords(lat, lon) {
+    fetch(`${geoUrl}&lat=${lat}&lon=${lon}&appid=${apiKey}`)
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector(".city").innerHTML = data.name;
+            document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°F";
+            document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+            document.querySelector(".wind").innerHTML = data.wind.speed + " mph";
+
+            if (data.weather[0].main == "Clouds") {
+                weatherIcon.src = "images/clouds.png";
+            } else if (data.weather[0].main == "Clear") {
+                weatherIcon.src = "images/clear.png";
+            } else if (data.weather[0].main == "Rain") {
+                weatherIcon.src = "images/rain.png";
+            } else if (data.weather[0].main == "Drizzle"){
+                weatherIcon.src = "images/drizzle.png";
+            } else if (data.weather[0].main == "Mist"){
+                weatherIcon.src = "images/mist.png";
+            }
+
+            document.querySelector(".weather").style.display = "block";
+            document.querySelector(".error").style.display = "none";
+
+            checkForecast(data.name);
+        })
+        .catch(error => {
+            document.querySelector(".error").style.display = "block";
+            document.querySelector(".weather").style.display = "none";
+        });
+}
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(position => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            checkWeatherByCoords(lat, lon);
+        }, () => {
+            // Fallback to search by city if location permission is denied
+            checkWeather("New York");
+        });
+    } else {
+        checkWeather("New York"); // Default city
+    }
+}
+
 searchBtn.addEventListener("click", ()=>{
     checkWeather(searchBox.value);
 })
 
-checkWeather();
+//Initialize weather based on geolocation or default city
+document.addEventListener("DOMContentLoaded", () => {
+    getLocation();
+});
+
 </script>
 
 </body>
